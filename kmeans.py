@@ -291,11 +291,10 @@ def allocate_cluster(clusters, mentions):
     ]
 
 
-def kmeans_predict(mentions):
+def kmeans_predict(mentions, cluster_number=100):
     '''
         生成特征空间，使用Kmeans聚类，再利用聚类结果重新标记
     '''
-    cluster_number = 120
     MentionDatum.shrink_features(threshold=5)
     feature_space = MentionDatum.regenerate_feature(mentions)
     logging.info(u'开始生成特征空间')
@@ -342,7 +341,7 @@ def relabel(allocate, mentions, clusters):
     )
 
 
-def regenerate_datums(mentions, filepath):
+def regenerate_datums(mentions, filepath, cluster_number):
     '''
         根据重新生成的标签重新生成datums
     '''
@@ -364,7 +363,7 @@ def regenerate_datums(mentions, filepath):
     logging.info(u'开始生成{0}个datums文件'.format(file_number))
     for index in xrange(file_number):
         logging.info(u'生成{0:0>2d}.datums文件'.format(index))
-        with open(filepath + '/{0:0>2d}.datums'.format(index), 'w') as f:
+        with open(filepath + '/{0:0>2d}_{1}.datums'.format(index, cluster_number), 'w') as f:
             for mention in mentions[index*90000:(index+1)*90000]:
                 mention_relation = mention.relabel_relation\
                     if mention.relabel_relation else mention.relation
@@ -398,11 +397,13 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
     logging.info(u'开始处理')
     start = time.clock()
+    cluster_number = 110
     mentions = datums_read('/home/jimin/mimlre-2012-11-27/corpora/kbp/train')
-    clusters, allocate = kmeans_predict(mentions)
+    clusters, allocate = kmeans_predict(mentions, cluster_number)
     relabel(allocate, mentions, clusters)
     regenerate_datums(
         mentions,
-        '/home/jimin/mimlre-2012-11-27/corpora/kbp/train/genTest'
+        '/home/jimin/mimlre-2012-11-27/corpora/kbp/train/genTest',
+        cluster_number,
     )
     logging.info(u'处理结束 共耗时{0}'.format(time.clock()-start))
