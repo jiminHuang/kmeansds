@@ -295,7 +295,7 @@ def kmeans_predict(mentions):
     '''
         生成特征空间，使用Kmeans聚类，再利用聚类结果重新标记
     '''
-    cluster_number = 110
+    cluster_number = 120
     MentionDatum.shrink_features(threshold=5)
     feature_space = MentionDatum.regenerate_feature(mentions)
     logging.info(u'开始生成特征空间')
@@ -403,6 +403,6 @@ if __name__ == '__main__':
     relabel(allocate, mentions, clusters)
     regenerate_datums(
         mentions,
-        '/home/jimin/test'
+        '/home/jimin/mimlre-2012-11-27/corpora/kbp/train/genTest'
     )
     logging.info(u'处理结束 共耗时{0}'.format(time.clock()-start))
